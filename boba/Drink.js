@@ -1,5 +1,5 @@
 const FLAVORS = ['milk tea', 'taro milk tea'];
-const BOBA = ['regular', 'mini'];
+const BOBA = [20, 5];
 const STRAWS = ['blue', 'red'];
 
 export default class Drink {
@@ -34,9 +34,24 @@ class Boba {
   remove() {}
 }
 
+class Ball {
+  constructor(size = 10) {
+    this.size = size;
+    this.pos = new Vec();
+    this.vel = new Vec();
+  }
+}
+
+class Vec {
+  constructor(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
+  }
+}
+
 function freshDrink() {
   return {
-    tea: new Tea(FLAVORS[0], 100),
+    tea: new Tea(FLAVORS[0], 500),
     straw: new Straw(STRAWS[0]),
     boba: new Boba(BOBA[0], 100),
   };
