@@ -1,5 +1,4 @@
-// import Drink from './Drink.js';
-// import { getMousePosition } from './util.js';
+import Drink from './Drink.js';
 
-// const drink = new Drink();
-// console.log(drink);
+const drink = new Drink();
+console.log(drink);
