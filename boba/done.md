@@ -1,5 +1,0 @@
-# Today
-
-- [x] Laundry
-- [ ] Vacuum
-- [ ]
