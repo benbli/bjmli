@@ -1,59 +1,88 @@
-// TODO:
-// - create mutation observer to listen to all events, create store, pass actions
-// if (element === #button) // do something
-// if (element === [button1, button2]) // do something
-// can scroll/intersection observer be used here as well?
+const rsvpForm = document.querySelector("#rsvp-form");
+const responseBtns = document.querySelectorAll("input[name=attending]");
+const MAXRETRIES = 3;
+const messages = {
+	ERROR: "Oops! Something is wrong, contact Ben and yell at him.",
+	RETRYING: "Retrying...",
+	SUBMITTING: "Submitting form...",
+	SUCCESS: "Form submitted successfully!",
+};
 
-const dialog = document.querySelector("#dialog");
-const dialogBtn = document.querySelector("#dialog-btn");
-dialogBtn?.addEventListener(
-	"click",
-	(e) => {
-		dialog.showModal();
-	},
-	false,
+responseBtns?.forEach((btn) =>
+	btn.addEventListener("click", () => hideNonRequiredFields(btn.form, btn.id)),
 );
 
-const dialogLinks = dialog?.querySelectorAll("a");
-dialogLinks?.forEach((link) =>
-	link.addEventListener(
-		"click",
-		(e) => {
-			dialog?.close();
-		},
-		false,
-	),
-);
+rsvpForm.addEventListener("submit", async (e) => {
+	e.preventDefault();
 
-// const rsvpForm = document.querySelector("#rsvp-form")
-// rsvpForm.addEventListener("submit", async (e) => {
-// 	e.preventDefault()
-// 	try {
-// 		const formData = new FormData(rsvpForm)
-// 		const jsonData = formatAsJson(formData)
-// 		console.log(jsonData)
-// 		const url = "/api/rsvps"
-// 		const options = {
-// 			method: "POST",
-// 			body: jsonData,
-// 			headers: {
-// 				"Content-Type": "application/json",
-// 				Accept: "application/json",
-// 			},
-// 		}
-// 		const response = await fetch(url, options)
-// 		console.log(response.json())
-// 	} catch (error) {
-// 		throw new Error(error)
-// 	}
-// })
+	const { SUBMITTING, SUCCESS, ERROR } = messages;
 
-// function formatAsJson(formData) {
-// 	const formEntries = Object.fromEntries(formData.entries())
-// 	return JSON.stringify(formEntries)
-// }
+	const submitter = e.submitter;
+	submitter.focus();
 
-// const menu = document.querySelector("#hamburger")
-// menu?.addEventListener("click", (e) => {
-// 	menu.classList.toggle("open")
-// })
+	const form = e.target;
+	const formData = new FormData(form);
+
+	createMessage(form, SUBMITTING);
+	disableFormFields(form, true);
+
+	try {
+		await sendForm(formData, MAXRETRIES);
+		createMessage(form, SUCCESS);
+		disableFormFields(form, false);
+	} catch (error) {
+		console.error(error);
+		createMessage(form, ERROR);
+		disableFormFields(form, false);
+	}
+});
+
+async function sendForm(formData, retries) {
+	const searchParams = new URLSearchParams(formData);
+	try {
+		// const response = await fetch("http://localhost:3000/api/rsvps", { // local testing
+		const response = await fetch("/api/rsvps", {
+			method: "POST",
+			body: searchParams,
+		});
+
+		if (!response.ok) {
+			throw new Error(`Server responded with status ${response.status}`);
+		}
+
+		return true;
+	} catch (error) {
+		if (retries > 0) {
+			console.warn(`Retrying form submission ${retries} retries left... `);
+			await delay(1000);
+
+			return sendForm(formData, retries - 1);
+		} else {
+			throw error;
+		}
+	}
+}
+
+function createMessage(parentNode, message) {
+	const messageEl = document.createElement("code");
+	messageEl.classList.add("text-center");
+	messageEl.textContent = message;
+	parentNode.appendChild(messageEl);
+	setTimeout(() => {
+		parentNode.removeChild(messageEl);
+	}, 5000);
+}
+
+function hideNonRequiredFields(form, id) {
+	id === "no"
+		? form.classList.add("declined")
+		: form.classList.remove("declined");
+}
+
+function disableFormFields(form, bool) {
+	Array.from(form.elements).forEach((field) => (field.disabled = bool));
+}
+
+function delay(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
