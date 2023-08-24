@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>if (read) write</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <nav><a href="/">Home</a></nav>
+  <header>
+    <h1>if (read) write</h1>
+    <p>Ramblings from a developer lost in web land.</p>
+  </header>
+  <main>
+    <section>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Activity</th>
+            <th>Notes</th>
+            <th>Tags</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2023-08-22</td>
+            <td>Coding</td>
+            <td>init(blog)</td>
+          </tr>
+          <tr>
+            <td>2023-08-23</td>
+            <td>Reading</td>
+            <td><a href="#harmful-class-field">Harmful Class fields</a></td>
+            <td>gotchas, oop</td>
+          </tr>
+          <tr>
+            <td>tbd</td>
+            <td>Reading</td>
+            <td><a href="#ts-pattern">ts-pattern</a> <em>In progress</em></td>
+            <td>lib, pattern</td>
+          </tr>
+          <tr>
+            <td>tbd</td>
+            <td>Reading</td>
+            <td><a href="#handle-event">handleEvent</a> <em>In progress</em></td>
+            <td>api</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <section>
+      <article id="harmful-class-field">
+        <h1>Class fields can cause harm <sup>oh naur</sup></h1>
+
+        <p><a href="https://webreflection.medium.com/js-class-fields-potentially-harmful-62d68f1a05f3">Article</a> by
+          Andrea Giammarchi</p>
+
+
+        <p><strong>Motivation</strong></p>
+
+        <p>In my pursuit to better understand JavaScript underthehood™ I've seen it been mentioned that there are
+          obscure differences between methods and arrow functions on Classes e.g. <code>handleClick() {}</code> vs.
+          <code>handleClick: () => {}</code>. I'd like to learn more about the potential pitfalls.
+        </p>
+
+        <p>What are the tradeoffs when I use arrow functions? When should I bind <code>this</code>? When should I
+          <code>call(this)</code> What are some alternatives?
+        </p>
+
+        <p><strong>Let's get some basics out of the way</strong></p>
+
+        <p>Wait..what's a class <em>field</em> again? *GPT-ing* Ok, it's basically a <em>property</em> that can
+          be either private or public (default is public, private is prefixed by a #). When naming fields there are two
+          that are off-limits: prototype and constructor. Duh.
+        </p>
+
+        <p>Point #1</p>
+        <p><del>If you create a method using an arrow function, there is no way to override the method if you plan to
+            <em>extend</em> the class. <code>this</code> only exists once super() is called which needs to be called
+            immediately
+            after the constructor is declared. It means any method overrides with the same name will only be scoped
+            locally. NOT the <code>this</code> of the parent class.</del>
+        </p>
+        <p><del>When extending a Class, the required super() already has a context <code>this</code>. Creating a method
+            using an arrow function in the extended child instance cannot alter the previously defined method on the
+            parent.</del>
+        </p>
+        <p>Ok, I give up trying to understand/explain this in my own words. Here's the GPT explanation:</p>
+        <blockquote>
+          Why This Happens:
+
+          To understand why this happens, we need to look at how class fields are de-sugared (translated) into
+          traditional JavaScript code that uses prototypes behind the scenes.
+
+          When you define a class field in a class, such as Counter, the actual method becomes a property of the
+          instance created from that class. In the case of DoubledCounter extending Counter, the method from the parent
+          class is already attached to the instance before the super() call in the subclass's constructor is executed.
+          This means that when you try to override the method in the subclass, you're actually creating a new method
+          that gets assigned after the initial parent method is already attached.
+        </blockquote>
+        <p>I was still a bit unclear as to why redefining a method doesn't override the parent's method
+          <em>regardless</em> of definition order. Does that mean subclass methods with matching parent class
+          methods can never be overridden?
+        </p>
+
+        <p>Point #2</p>
+        <p>There are a few ways to get the expected behavior:</p>
+        <ol>
+          <li>
+            Stick to the old way handler.bind(this)
+          </li>
+          <li>
+            Cut out all the sugar and define your method on the <code>prototype</code>
+          </li>
+          <li>Via accessor <code>get</code></li>
+          <li>Double arrow functions?? This is getting too complicated</li>
+          <li>Last but not least: handleEvent()* This will be the focus of my next post as I'll hopefully be using it
+            extensively in future projects</li>
+        </ol>
+
+        <p><strong>Cool bits</strong></p>
+        <p>I learned what a class field is and better yet I learned it can be
+          <strong>computed.</strong><code>[`${taco}`] = 'suadero'</code>
+        </p>
+        <p>I don't think I answered my original questions that motivated me to read this article in the first place.
+          Though, I'm glad I decided to start writing again.</p>
+      </article>
+
+      <!-- <article id="ts-pattern">
+        <h1>ts-pattern</h1>
+        <p><strong>What is it?</strong></p>
+        <p></p>
+      </article>
+
+      <article id="handle-event">
+        <h1>handleEvent</h1>
+        <p><strong>Expectation</strong></p>
+        <p>I would like to better understand </p>
+        <p></p>
+      </article> -->
+
+    </section>
+  </main>
+  <footer>
+    <span>bjm.li © 2023 🦶🏻er</span>
+  </footer>
+</body>
+
+</html>

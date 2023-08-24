@@ -1,0 +1,40 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:where(html) {
+  -webkit-text-size-adjust: none;
+  color-scheme: dark light;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :where(html:focus-within) {
+    scroll-behavior: smooth;
+  }
+}
+
+:where(body) {
+  line-height: 1.5;
+  font-family: system-ui, sans-serif;
+}
+
+:where(a) {
+  color: inherit;
+  text-underline-offset: 0.2ex;
+}
+
+:where(input, button, textarea, select) {
+  font: inherit;
+  color: inherit;
+}
+
+:where(button, label, select, summary, [role='button'], [role='option']) {
+  cursor: pointer;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
