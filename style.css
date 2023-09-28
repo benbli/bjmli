@@ -105,3 +105,16 @@ sub {
 sup {
   top: -0.5em;
 }
+
+.container {
+  max-inline-size: 85vw;
+  margin-inline: auto;
+}
+
+.flex {
+  display: flex;
+}
+
+.site-nav {
+  gap: 0.5rem;
+}
